@@ -33,6 +33,19 @@ override this, pass the column name to the methods:
 
     Post.alphabetical("title") # => ActiveRecord::Relation
     Comment.reverse_chronological("time") # => ActiveRecord::Relation
+
+There is also a finder method called `since`:
+
+    user_0 = User.create(created_at: 5.days.ago)
+    user_1 = User.create(created_at: 3.days.ago)
+    user_2 = User.create(created_at: 2.days.ago)
+
+    new_users = User.since(4.days.ago)
+
+    new_users.include?(user_0) # => false
+    new_users.include?(user_1) # => true
+    new_users.include?(user_2) # => true
+
     
 ## Contributing
 

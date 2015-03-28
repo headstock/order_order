@@ -41,6 +41,14 @@ module OrderOrder
     # or `self.name_column` at the model level would negate the need to pass an
     # argument to these methods.
 
+
+    # Return all records created SINCE the provided date
+    #
+    # @param [Time]
+    # @return [ActiveRecord::Relation]
+    def since(time)
+      where("created_at > ?", time)
+    end
   end
 end
 
