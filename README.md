@@ -46,6 +46,25 @@ There is also a finder method called `since`:
     new_users.include?(user_1) # => true
     new_users.include?(user_2) # => true
 
+`.alphabetical` and `.reverse_alphabetical` take an optional parameter 'case_sensitive'
+(true by default):
+
+    person_1 = Person.create(name: "Steve")
+    person_2 = Person.create(name: "Bill")
+    person_3 = Person.create(name: "dave")
+
+    puts Post.alphabetical.pluck(:name)
+    # => Bill
+    # => Steve
+    # => dave
+    puts Post.alphabetical.pluck(:name, case_sensitive: false)
+    # => Bill
+    # => dave
+    # => Steve
+
+Note that `case_sensitive` has only been tested on PostgreSQL. Feel free to add
+it for one of the other SQL adapters if you need it.
+
     
 ## Contributing
 
