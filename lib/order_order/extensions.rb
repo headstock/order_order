@@ -5,11 +5,14 @@
 module OrderOrder
   module Extensions
 
+    DEFAULT_ALPHABETICAL_COLUMN  = :name
+    DEFAULT_CHRONOLOGICAL_COLUMN = :created_at
+
     # Order records by date, with the newest records first.
     #
     # @param column [String] the name of the column which represents the object's
     # date. Defaults to `created_at`
-    def chronological(column=:created_at)
+    def chronological(column=DEFAULT_CHRONOLOGICAL_COLUMN)
       order("#{column} ASC")
     end
 
@@ -17,23 +20,31 @@ module OrderOrder
     #
     # @param column [String] the name of the column which represents the object's
     # date. Defaults to `created_at`
-    def reverse_chronological(column=:created_at)
+    def reverse_chronological(column=DEFAULT_CHRONOLOGICAL_COLUMN)
       order("#{column} DESC")
     end
 
     # Order records alphabetically.
     #
-    # @param column [String] the name of the column which represents the object's
-    #   name. Defaults to `name`
-    def alphabetical(column=:name)
+    # @param column_or_options [String] the name of the column which represents the object's
+    #   name, or a hash of options. Defaults to `"name"`.
+    #
+    # @option case_sensitive [Boolean] order case-sensitively, e.g. "C" will go
+    #   before "b". True by default
+    def alphabetical(column_or_options=DEFAULT_ALPHABETICAL_COLUMN, options={})
+      column = get_alphabetical_column(column_or_options, options)
       order("#{column} ASC")
     end
 
-    # Order records reverse alphabetically.
+    # Order records alphabetically.
     #
-    # @param column [String] the name of the column which represents the object's
-    #   name. Defaults to `name`
-    def reverse_alphabetical(column=:name)
+    # @param column_or_options [String] the name of the column which represents the object's
+    #   name, or a hash of options. Defaults to `"name"`.
+    #
+    # @option case_sensitive [Boolean] order case-sensitively, e.g. "C" will go
+    #   after "b". True by default
+    def reverse_alphabetical(column_or_options=DEFAULT_ALPHABETICAL_COLUMN, options={})
+      column = get_alphabetical_column(column_or_options, options)
       order("#{column} DESC")
     end
 
@@ -48,6 +59,21 @@ module OrderOrder
     # @return [ActiveRecord::Relation]
     def since(time)
       where("created_at > ?", time)
+    end
+
+
+    private
+
+    def get_alphabetical_column(column_or_options, options)
+      if column_or_options.is_a?(Hash)
+        options = column_or_options
+        column  = DEFAULT_ALPHABETICAL_COLUMN
+      else
+        column  = column_or_options
+      end
+
+      column = "lower(#{column})" if !options.fetch(:case_sensitive, true)
+      column
     end
   end
 end
